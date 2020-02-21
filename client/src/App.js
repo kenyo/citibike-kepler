@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  fetch('/data/dailyBase.json').then(console.log)
   return (
     <div className="App">
       <header className="App-header">
