@@ -18,7 +18,9 @@ function getStationInfoAndMergeWithStatus(status) {
   return axios.get(stationInfoApi)
     .then(x => x.data.data)
     .then(x => x.stations.map(y =>
-      Object.assign({}, y, status.data.stations.find(z => z.station_id === y.station_id))
+      Object.assign({}, y, status.data.stations.find(
+          z => z.station_id === y.station_id
+        ))
     ))
 }
 
