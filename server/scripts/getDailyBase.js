@@ -5,7 +5,7 @@ const apiBase = `https://gbfs.citibikenyc.com/gbfs/en`
 const stationStatusApi = `${apiBase}/station_status.json`
 const stationInfoApi = `${apiBase}/station_information.json`
 
-export default function getDailyBase() {
+function getDailyBase() {
   return axios.get(stationStatusApi)
     .then(x => x.data)
     .then(getStationInfoAndMergeWithStatus)
@@ -42,3 +42,5 @@ function writeToFile(x) {
     console.log('The file has been saved!')
   })
 }
+
+module.exports = { getDailyBase, cleanStationData }
