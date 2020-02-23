@@ -1,14 +1,15 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express')
+const path = require('path')
+const favicon = require('serve-favicon')
+const logger = require('morgan')
+const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
+const cron = require('node-cron')
+const fs = require('fs')
+const { getDailyBase } = require('./scripts/getDailyBase')
+const updateStationStatus = require('./scripts/updateStationStatus')
 
-var index = require('./routes/index');
-var users = require('./routes/users');
-
-var app = express();
+const app = express()
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,10 +28,8 @@ app.use(express.static(path.join(__dirname, 'build')));
 app.use('/api', express.static(path.join(__dirname, 'data')));
 
 app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-
-app.use('/users', users);
+  res.sendFile(path.join(__dirname, 'build', 'index.html'))
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -49,5 +48,23 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+cron.schedule('*/10 * * * *', () => {
+  updateStationStatus()
+
+  console.log(`update station status at ${new Date()}`)
+});
+
+cron.schedule('* 3 * * *', () => {
+  getDailyBase()
+
+  fs.unlink('./data/dailyTimeSeries.json', (err) => {
+    if (err) throw err;
+    console.log('successfully deleted ./data/dailyTimeSeries.json');
+  });
+
+  console.log(`getDailyBase at ${new Date()}`)
+})
+
 
 module.exports = app;
